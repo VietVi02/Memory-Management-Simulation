@@ -335,24 +335,28 @@ function App() {
           {/* Memory Visualization */}
           <h3 className="flex justify-center text-xl font-semibold text-gray-700 mt-4">Memory Visualization</h3>
           <div className="w-full bg-gray-200 rounded-xl overflow-hidden my-4 flex">
-            {blocks.map((b, i) => {
-              const totalMemory = blocks.reduce((a, c) => a + c, 0);
-              const widthPercent = (b / totalMemory) * 100;
+            {(() => {
+              const scaledBlocks = blocks.map((b) => Math.log2(b));
+              const totalScaled = scaledBlocks.reduce((a, c) => a + c, 0);
 
-              return (
-                <div
-                  key={i}
-                  title={`Block ${i + 1} - ${b} KB`}
-                  style={{
-                    width: `${widthPercent}%`,
-                    height: '3rem',
-                    borderRight:
-                      i !== blocks.length - 1 ? '1px solid rgba(255,255,255,0.7)' : 'none',
-                  }}
-                  className="bg-gray-400 transition-all duration-300"
-                ></div>
-              );
-            })}
+              return scaledBlocks.map((scaled, i) => {
+                const widthPercent = (scaled / totalScaled) * 100;
+
+                return (
+                  <div
+                    key={i}
+                    title={`Block ${i + 1} - ${blocks[i]} KB`}
+                    style={{
+                      width: `${widthPercent}%`,
+                      height: '3rem',
+                      borderRight:
+                        i !== blocks.length - 1 ? '1px solid rgba(255,255,255,0.7)' : 'none',
+                    }}
+                    className="bg-gray-400 transition-all duration-300"
+                  ></div>
+                );
+              });
+            })()}
           </div>
 
           <div className="mt-4">
@@ -414,27 +418,31 @@ function App() {
               {/* Memory Visualization */}
               <h3 className="flex justify-center text-xl font-semibold text-gray-700 mt-4">Memory Visualization</h3>
               <div className="w-full bg-gray-200 rounded-xl overflow-hidden my-4 flex">
-                {blocks.map((b, i) => {
-                  const totalMemory = blocks.reduce((a, c) => a + c, 0);
-                  const widthPercent = (b / totalMemory) * 100;
+                {(() => {
+                  const scaledBlocks = blocks.map((b) => Math.log2(b));
+                  const totalScaled = scaledBlocks.reduce((a, c) => a + c, 0);
 
-                  return (
-                    <div
-                      key={i}
-                      title={`Block ${i + 1} - ${b} KB`}
-                      style={{
-                        width: `${widthPercent}%`,
-                        height: '3rem',
-                        marginRight: i !== blocks.length - 1 ? '1px' : '0',
-                      }}
-                      className={`transition-all duration-300 ${
-                        data.allocation.includes(i)
-                          ? 'bg-green-500'
-                          : 'bg-gray-400'
-                      }`}
-                    ></div>
-                  );
-                })}
+                  return scaledBlocks.map((scaled, i) => {
+                    const widthPercent = (scaled / totalScaled) * 100;
+
+                    return (
+                      <div
+                        key={i}
+                        title={`Block ${i + 1} - ${blocks[i]} KB`}
+                        style={{
+                          width: `${widthPercent}%`,
+                          height: '3rem',
+                          marginRight: i !== blocks.length - 1 ? '1px' : '0',
+                        }}
+                        className={`transition-all duration-300 ${
+                          data.allocation.includes(i)
+                            ? 'bg-green-500'
+                            : 'bg-gray-400'
+                        }`}
+                      ></div>
+                    );
+                  });
+                })()}
               </div>
 
               {/* Metrics */}
