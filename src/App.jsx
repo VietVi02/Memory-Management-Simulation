@@ -106,21 +106,31 @@ function App() {
           internalFragmentation += (blocks[blockIdx] - processes[i])
         }
       })
-      const unusedBlocks = blocks
-        .map((b, i) => (allocation.includes(i) ? 0 : b))
-        .reduce((a, b) => a + b, 0)
-
+  
+      const allocatedSet = new Set(allocation.filter((a) => a !== -1));
       const allocatedBlocks = allocation.filter((a) => a !== -1)
       const allocatedProcesses = allocatedBlocks.length
+      const unallocatedProcesses = processes.filter((_, i) => allocation[i] === -1);
+
       const totalAllocated = processes
         .map((p, i) => (allocation[i] !== -1 ? p : 0))
         .reduce((a, b) => a + b, 0)
+
       const totalMemory = blocks.reduce((a, b) => a + b, 0)
-      
-      const fragmentation = ((internalFragmentation + unusedBlocks) / totalMemory) * 100
+
+      let externalFragmentation = 0;
+      if (unallocatedProcesses.length > 0) {
+        blocks.forEach((block, i) => {
+          if (!allocatedSet.has(i)) {
+            const canFit = unallocatedProcesses.some((p) => p <= block);
+            if (!canFit) externalFragmentation += block;
+          }
+        });
+      }
+
+      const fragmentation = ((internalFragmentation + externalFragmentation) / totalMemory) * 100
       const utilization = (totalAllocated / totalMemory) * 100
       const allocationTime = end - start
-      const externalFragmentation = unusedBlocks
       const totalWasted = internalFragmentation + externalFragmentation;
 
       simResults[type] = {
